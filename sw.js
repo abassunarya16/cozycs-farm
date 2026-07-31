@@ -1,6 +1,6 @@
 // Cozycs Farm V2 - Service Worker
-const CACHE_NAME = 'cozycs-farm-v2-cache-v1.0.0';
-const DYNAMIC_CACHE = 'cozycs-farm-v2-dynamic-v1.0.0';
+const CACHE_NAME = 'cozycs-farm-v2-cache';
+const DYNAMIC_CACHE = 'cozycs-farm-v2-dynamic';
 
 // Resources to cache on install
 const STATIC_ASSETS = [
