@@ -77,64 +77,51 @@ var dashboard = (function() {
     function init() {
         updateDateTime();
         setInterval(updateDateTime, 30000);
-        
-        // PASANG EVENT LISTENER UNTUK TOMBOL SYNC DI HEADER
-        var btn = document.getElementById("btnRefresh");
-        if (btn) {
-            // Hapus event click lama agar tidak double click
-            var newBtn = btn.cloneNode(true);
-            btn.parentNode.replaceChild(newBtn, btn);
-            newBtn.addEventListener("click", syncData);
-        }
     }
 
     // ==========================================
-    // FUNGSI SYNC DATA (KODE DARI AYY)
+    // FUNGSI SYNC DATA DARI AYY
     // ==========================================
-        function syncData() {
+    function syncData() {
         var btn = document.getElementById("syncBtn");
-        if (!btn) btn = document.getElementById("btnRefresh"); // Fallback jika ID belum diubah di HTML
+        if (!btn) btn = document.getElementById("btnRefresh");
         
         var icon = btn ? btn.querySelector("i") : null;
         if (icon) icon.classList.add("fa-spin");
 
         try {
-            // 1. Update HST otomatis
+            // Update HST otomatis
             if (window.Storage && typeof Storage.updateAllHST === 'function') {
                 Storage.updateAllHST();
             }
 
-            // 2. Update Cuaca & Lokasi
+            // Update Weather
             if (typeof fetchWeatherAndLocation === 'function') {
                 fetchWeatherAndLocation();
             } else if (window.weather && typeof weather.updateWeather === 'function') {
                 weather.updateWeather();
             }
 
-            // 3. Reload / Refresh Halaman Dashboard
+            // Reload semua halaman via router
             if (window.Router && typeof Router.navigate === 'function') {
                 Router.navigate("dashboard");
             }
 
-            // 4. Notifikasi Sukses
             if (typeof Notification !== "undefined" && typeof Notification.success === 'function') {
-                Notification.success("Data & cuaca berhasil diperbarui!");
+                Notification.success("Data berhasil diperbarui");
             }
 
-        } catch (e) {
-            console.error("Error Syncing Data:", e);
-
+        } catch(e) {
+            console.error(e);
             if (typeof Notification !== "undefined" && typeof Notification.error === 'function') {
                 Notification.error("Gagal memperbarui data");
             }
         }
 
-        // Hentikan animasi putar setelah 1 detik
         setTimeout(function() {
             if (icon) icon.classList.remove("fa-spin");
         }, 1000);
     }
-
 
     // --- Helper Functions ---
     function getWeatherData() {
@@ -222,6 +209,13 @@ var dashboard = (function() {
         return 'Selamat Malam';
     }
 
-    return { render: render, init: init };
+    // ==========================================
+    // EKSPOR FUNGSI KE LUAR (RETURN)
+    // ==========================================
+    return { 
+        render: render, 
+        init: init,
+        syncData: syncData
+    };
 
 })();
