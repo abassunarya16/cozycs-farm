@@ -1,0 +1,68 @@
+[
+    {
+        "id": "pol-001",
+        "tanaman_id": "GH01-T01-L02",
+        "tanggal": "2026-07-20",
+        "jam": "07:30",
+        "ruas": "12-14",
+        "bunga": "betina",
+        "operator": "Andi",
+        "status": "berhasil",
+        "catatan": "Polinasi pagi, bunga segar"
+    },
+    {
+        "id": "pol-002",
+        "tanaman_id": "GH01-T01-L03",
+        "tanggal": "2026-07-21",
+        "jam": "07:45",
+        "ruas": "13-15",
+        "bunga": "betina",
+        "operator": "Andi",
+        "status": "berhasil",
+        "catatan": ""
+    },
+    {
+        "id": "pol-003",
+        "tanaman_id": "GH01-T02-L05",
+        "tanggal": "2026-07-10",
+        "jam": "08:00",
+        "ruas": "11-13",
+        "bunga": "hermafrodit",
+        "operator": "Budi",
+        "status": "berhasil",
+        "catatan": "Polinasi berhasil, bunga berkembang"
+    },
+    {
+        "id": "pol-004",
+        "tanaman_id": "GH01-T03-L10",
+        "tanggal": "2026-07-08",
+        "jam": "07:15",
+        "ruas": "10-12",
+        "bunga": "betina",
+        "operator": "Budi",
+        "status": "berhasil",
+        "catatan": ""
+    },
+    {
+        "id": "pol-005",
+        "tanaman_id": "GH02-T02-L03",
+        "tanggal": "2026-07-05",
+        "jam": "07:30",
+        "ruas": "12-14",
+        "bunga": "betina",
+        "operator": "Andi",
+        "status": "berhasil",
+        "catatan": ""
+    },
+    {
+        "id": "pol-006",
+        "tanaman_id": "GH01-T01-L01",
+        "tanggal": "2026-07-25",
+        "jam": "07:30",
+        "ruas": "12-15",
+        "bunga": "jantan",
+        "operator": "Andi",
+        "status": "gagal",
+        "catatan": "Bunga jantan layu sebelum polinasi"
+    }
+]
