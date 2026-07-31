@@ -43,17 +43,18 @@ var dashboard = (function() {
         html += '<div style="font-size:13px;font-weight:700;color:#1B5E20;text-transform:uppercase;margin-bottom:12px;"><i class="fas fa-sliders-h"></i> Monitoring Sensor Terakhir</div>';
         html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center;">';
         
-        html += '<div onclick="Router.navigate(\'nutrisi\')" style="background:#F3E5F5;padding:14px 8px;border-radius:10px;cursor:pointer;">';
+        // PERBAIKAN: Memastikan pemanggilan Router.navigate menggunakan format string yang tepat
+        html += '<div onclick="Router.navigate(\'nutrisi\')" style="background:#F3E5F5;padding:14px 8px;border-radius:10px;cursor:pointer;transition:transform 0.1s;" onactive="this.style.transform=\'scale(0.95)\'">';
         html += '<i class="fas fa-flask" style="color:#7B1FA2;font-size:20px;margin-bottom:6px;"></i>';
         html += '<div style="font-size:18px;font-weight:bold;color:#7B1FA2;">' + (stats.ppmTerakhir || '-') + '</div>';
         html += '<div style="font-size:11px;color:#666;">PPM</div></div>';
 
-        html += '<div onclick="Router.navigate(\'nutrisi\')" style="background:#E0F2F1;padding:14px 8px;border-radius:10px;cursor:pointer;">';
+        html += '<div onclick="Router.navigate(\'nutrisi\')" style="background:#E0F2F1;padding:14px 8px;border-radius:10px;cursor:pointer;transition:transform 0.1s;" onactive="this.style.transform=\'scale(0.95)\'">';
         html += '<i class="fas fa-vial" style="color:#00838F;font-size:20px;margin-bottom:6px;"></i>';
         html += '<div style="font-size:18px;font-weight:bold;color:#00838F;">' + (stats.phTerakhir || '-') + '</div>';
         html += '<div style="font-size:11px;color:#666;">pH</div></div>';
 
-        html += '<div onclick="Router.navigate(\'nutrisi\')" style="background:#E3F2FD;padding:14px 8px;border-radius:10px;cursor:pointer;">';
+        html += '<div onclick="Router.navigate(\'nutrisi\')" style="background:#E3F2FD;padding:14px 8px;border-radius:10px;cursor:pointer;transition:transform 0.1s;" onactive="this.style.transform=\'scale(0.95)\'">';
         html += '<i class="fas fa-thermometer-half" style="color:#1976D2;font-size:20px;margin-bottom:6px;"></i>';
         html += '<div style="font-size:18px;font-weight:bold;color:#1976D2;">' + (stats.suhuAirTerakhir || '-') + '</div>';
         html += '<div style="font-size:11px;color:#666;">Suhu Air</div></div>';
@@ -116,7 +117,8 @@ var dashboard = (function() {
     }
 
     function makeStatCard(label, icon, bg, color, value, targetPage) {
-        var action = targetPage ? ' onclick="Router.navigate(\'' + targetPage + '\')" style="cursor:pointer;"' : '';
+        // PERBAIKAN: Navigasi router yang lebih kokoh
+        var action = targetPage ? ' onclick="if(typeof Router !== \'undefined\') { Router.navigate(\'' + targetPage + '\'); }" style="cursor:pointer;"' : '';
         return '<div class="stat-card"' + action + '>' +
             '<div class="stat-icon" style="background:' + bg + '"><i class="fas ' + icon + '" style="color:' + color + '"></i></div>' +
             '<div class="stat-info"><span class="stat-value">' + value + '</span><span class="stat-label">' + label + '</span></div>' +
@@ -124,22 +126,29 @@ var dashboard = (function() {
     }
 
     function calculateStats() {
-        var tanaman = Storage.getAll(Storage.KEYS.TANAMAN);
-        var nutrisi = Storage.getAll(Storage.KEYS.NUTRISI);
-        var panen = Storage.getAll(Storage.KEYS.PANEN);
+        var tanaman = Storage.getAll(Storage.KEYS.TANAMAN) || [];
+        var nutrisi = Storage.getAll(Storage.KEYS.NUTRISI) || [];
+        var panen = Storage.getAll(Storage.KEYS.PANEN) || [];
         var today = getToday();
-        var sortedNutrisi = nutrisi.sort(function(a, b) { return new Date(b.tanggal) - new Date(a.tanggal); });
+        
+        // PERBAIKAN: Pastikan data nutrisi tidak crash kalau kosong
+        var sortedNutrisi = nutrisi.slice().sort(function(a, b) { 
+            return new Date(b.tanggal) - new Date(a.tanggal); 
+        });
         var latestNutrisi = sortedNutrisi[0] || {};
+        
         var pendingTasks = 0;
-        try { if (Notification && typeof Notification.getPendingTaskCount === 'function') pendingTasks = Notification.getPendingTaskCount(); } catch(e) {}
+        try { if (typeof Notification !== 'undefined' && typeof Notification.getPendingTaskCount === 'function') pendingTasks = Notification.getPendingTaskCount(); } catch(e) {}
+        
         return {
             totalTanaman: tanaman.length,
             tanamanHidup: tanaman.filter(function(t) { return t.status_tanaman !== 'mati' && t.status_panen !== 'panen'; }).length,
             sudahPolinasi: tanaman.filter(function(t) { return t.status_polinasi === 'sudah polinasi'; }).length,
             fixBuah: tanaman.filter(function(t) { return t.status_buah === 'fix buah'; }).length,
-            ppmTerakhir: latestNutrisi.ppm_pagi || latestNutrisi.ppm_sore || null,
-            phTerakhir: latestNutrisi.ph_pagi || latestNutrisi.ph_sore || null,
-            suhuAirTerakhir: latestNutrisi.suhu_air || null,
+            // PERBAIKAN: Penanganan jika nilai 0 agar tetap muncul
+            ppmTerakhir: latestNutrisi.ppm_pagi !== undefined ? latestNutrisi.ppm_pagi : (latestNutrisi.ppm_sore !== undefined ? latestNutrisi.ppm_sore : null),
+            phTerakhir: latestNutrisi.ph_pagi !== undefined ? latestNutrisi.ph_pagi : (latestNutrisi.ph_sore !== undefined ? latestNutrisi.ph_sore : null),
+            suhuAirTerakhir: latestNutrisi.suhu_air !== undefined ? latestNutrisi.suhu_air : null,
             panenHariIni: panen.filter(function(p) { return p.tanggal === today; }).length,
             tugasPending: pendingTasks
         };
