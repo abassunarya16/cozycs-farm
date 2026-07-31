@@ -37,59 +37,46 @@ function finishLoading() {
     // Setup tombol-tombol (Waktu tunggu dikurangi agar langsung aktif)
     setTimeout(function() {
         // ==========================================
-        // TOMBOL SYNC / REFRESH 
-        // ==========================================
-        var refreshBtn = document.getElementById('btnRefresh');
-        if (refreshBtn) {
-            // Kita pakai kloning untuk menghapus event lama agar tidak bentrok
-            var newRefreshBtn = refreshBtn.cloneNode(true);
-            refreshBtn.parentNode.replaceChild(newRefreshBtn, refreshBtn);
-            
-            newRefreshBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                var icon = this.querySelector('i');
-                
-                // 1. Nyalakan Animasi Muter (pada ikon aslinya)
-                if (icon) { 
-                    icon.classList.add('fa-spin'); 
-                    icon.style.color = '#C8E6C9'; // Sedikit berubah warna sebagai efek ditekan
-                }
-                
-                // 2. Fetch data GPS & Cuaca terbaru di background
-                fetchWeatherAndLocation();
-                
-                // 3. Jeda 0.8 detik supaya animasinya enak dilihat
-                setTimeout(function() {
-                    try { 
-                        // Update notifikasi
-                        if (typeof Notification !== 'undefined') Notification.updateBadge();
-                        
-                        // Render ulang halaman yang sedang aktif (Soft Refresh)
-                        if (typeof Router !== 'undefined') {
-                            var currentPage = Router.getCurrentPage();
-                            if (currentPage === 'dashboard' && typeof dashboard !== 'undefined') {
-                                document.getElementById('mainContent').innerHTML = dashboard.render();
-                            } else {
-                                Router.navigate(currentPage);
-                            }
-                        }
-                        
-                        // Matikan animasi dan kembalikan warna
-                        if (icon) { 
-                            icon.classList.remove('fa-spin'); 
-                            icon.style.color = ''; 
-                        }
-                        
-                        // Tampilkan pemberitahuan sukses
-                        if (typeof Notification !== 'undefined') Notification.success('✅ Data berhasil diperbarui!');
-                        
-                    } catch(err) {
-                        // Kalau Soft Refresh error, kita paksa Hard Refresh (Reload webnya)
-                        window.location.reload(true);
-                    }
-                }, 800);
-            });
+// TOMBOL SYNC / REFRESH
+// ==========================================
+var refreshBtn = document.getElementById('syncBtn');
+
+if (refreshBtn) {
+
+    refreshBtn.addEventListener('click', function (e) {
+
+        e.preventDefault();
+
+        var icon = this.querySelector('i');
+
+        if (icon) {
+            icon.classList.add('fa-spin');
         }
+
+        // Ambil ulang lokasi & cuaca
+        fetchWeatherAndLocation();
+
+        // Refresh halaman yang sedang dibuka
+        setTimeout(function () {
+
+            if (typeof Router !== 'undefined') {
+                Router.navigate(Router.getCurrentPage());
+            }
+
+            if (typeof Notification !== 'undefined' &&
+                typeof Notification.updateBadge === 'function') {
+                Notification.updateBadge();
+            }
+
+            if (icon) {
+                icon.classList.remove('fa-spin');
+            }
+
+        }, 1000);
+
+    });
+
+}
         
         // ==========================================
         // TOMBOL NOTIFIKASI
@@ -143,32 +130,69 @@ function fetchWeatherAndLocation() {
 }
 
 function fetchCuaca(lat, lon) {
+
     fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current=relative_humidity_2m,temperature_2m,weather_code')
-        .then(function(r) { return r.json(); })
+        .then(function(r) {
+            return r.json();
+        })
         .then(function(data) {
+
             if (data && data.current) {
+
                 var c = data.current;
                 var temp = Math.round(c.temperature_2m);
                 var humid = Math.round(c.relative_humidity_2m);
                 var code = c.weather_code || 0;
+
                 var icon = '⛅';
-                if (code === 0) icon = '☀️';
-                else if (code <= 2) icon = '🌤️';
-                else if (code === 3) icon = '☁️';
-                else if (code <= 48) icon = '🌫️';
-                else if (code <= 67) icon = '🌧️';
-                else if (code >= 95) icon = '⛈️';
-                
-                localStorage.setItem('cozycs_weather', JSON.stringify({ icon: icon, temp: temp, humid: humid, time: Date.now() }));
-                
+
+                if (code === 0) {
+                    icon = '☀️';
+                } else if (code <= 2) {
+                    icon = '🌤️';
+                } else if (code === 3) {
+                    icon = '☁️';
+                } else if (code <= 48) {
+                    icon = '🌫️';
+                } else if (code <= 67) {
+                    icon = '🌧️';
+                } else if (code >= 95) {
+                    icon = '⛈️';
+                }
+
+                // Simpan ke LocalStorage
+                localStorage.setItem('cozycs_weather', JSON.stringify({
+                    icon: icon,
+                    temp: temp,
+                    humid: humid,
+                    time: Date.now()
+                }));
+
+                // Update Dashboard jika elemen ada
                 var iconEl = document.getElementById('weatherIcon');
                 var tempEl = document.getElementById('weatherTemp');
                 var humidEl = document.getElementById('weatherHumid');
+
                 if (iconEl) iconEl.textContent = icon;
                 if (tempEl) tempEl.textContent = temp + '°C';
                 if (humidEl) humidEl.textContent = humid + '%';
+
+                // Refresh Dashboard otomatis
+                if (typeof Router !== 'undefined' &&
+                    Router.getCurrentPage() === 'dashboard') {
+
+                    setTimeout(function () {
+                        Router.navigate('dashboard');
+                    }, 100);
+                }
+
             }
-        }).catch(function(e){ console.log("Info: Gagal mengambil cuaca"); });
+
+        })
+        .catch(function(e) {
+            console.log("Info: Gagal mengambil cuaca", e);
+        });
+
 }
 
 // Auto refresh setiap 15 menit
