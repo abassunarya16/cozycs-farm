@@ -1,26 +1,32 @@
-var CACHE_NAME = 'cozycs-farm-v1';
-var urlsToCache = [
-    '/',
-    '/index.html',
-    '/css/style.css',
-    '/css/dashboard.css',
-    '/js/app.js',
-    '/js/storage.js',
-    '/js/router.js'
+const CACHE_NAME = 'cozycs-farm-v1';
+
+// Daftar file yang akan disimpan agar bisa dibuka offline
+const urlsToCache = [
+  './',
+  './index.html',
+  './manifest.json',
+  './img/logo-clear.png'
 ];
 
-self.addEventListener('install', function(event) {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then(function(cache) {
-            return cache.addAll(urlsToCache);
-        })
-    );
+// Proses Install Service Worker
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        return cache.addAll(urlsToCache);
+      })
+  );
 });
 
-self.addEventListener('fetch', function(event) {
-    event.respondWith(
-        caches.match(event.request).then(function(response) {
-            return response || fetch(event.request);
-        })
-    );
+// Proses Fetch (Membaca file dari cache saat offline)
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        if (response) {
+          return response; // Gunakan file dari cache
+        }
+        return fetch(event.request); // Ambil dari internet jika tidak ada di cache
+      })
+  );
 });
