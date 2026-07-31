@@ -1,0 +1,20 @@
+[
+    {
+        "id": "hama-001",
+        "tanaman_id": "GH02-T01-L02",
+        "tanggal": "2026-07-26",
+        "jenis": "Kutu Daun",
+        "tingkat": "Sedang",
+        "penanganan": "Semprot insektisida nabati",
+        "catatan": "Ditemukan di bagian bawah daun, segera ditangani"
+    },
+    {
+        "id": "hama-002",
+        "tanaman_id": "GH01-T01-L01",
+        "tanggal": "2026-07-24",
+        "jenis": "Layu Fusarium",
+        "tingkat": "Ringan",
+        "penanganan": "Pangkas bagian terinfeksi, semprot fungisida",
+        "catatan": "Terdeteksi dini, penanganan cepat"
+    }
+]
