@@ -91,40 +91,50 @@ var dashboard = (function() {
     // ==========================================
     // FUNGSI SYNC DATA (KODE DARI AYY)
     // ==========================================
-    function syncData() {
-        var btn = document.getElementById("btnRefresh"); // Sesuaikan id dengan index.html
-        if (!btn) return;
-        var icon = btn.querySelector("i");
-
+        function syncData() {
+        var btn = document.getElementById("syncBtn");
+        if (!btn) btn = document.getElementById("btnRefresh"); // Fallback jika ID belum diubah di HTML
+        
+        var icon = btn ? btn.querySelector("i") : null;
         if (icon) icon.classList.add("fa-spin");
 
         try {
-            // Update HST otomatis
+            // 1. Update HST otomatis
             if (window.Storage && typeof Storage.updateAllHST === 'function') {
                 Storage.updateAllHST();
             }
 
-            // Reload semua halaman via router
-            if (window.Router) {
-                // Menuju ke halaman utama agar data terender ulang
-                Router.navigate("dashboard"); 
+            // 2. Update Cuaca & Lokasi
+            if (typeof fetchWeatherAndLocation === 'function') {
+                fetchWeatherAndLocation();
+            } else if (window.weather && typeof weather.updateWeather === 'function') {
+                weather.updateWeather();
             }
 
-            if(typeof Notification !== "undefined"){
-                Notification.success("Data berhasil diperbarui");
+            // 3. Reload / Refresh Halaman Dashboard
+            if (window.Router && typeof Router.navigate === 'function') {
+                Router.navigate("dashboard");
             }
 
-        } catch(e){
-            console.error(e);
-            if(typeof Notification !== "undefined"){
+            // 4. Notifikasi Sukses
+            if (typeof Notification !== "undefined" && typeof Notification.success === 'function') {
+                Notification.success("Data & cuaca berhasil diperbarui!");
+            }
+
+        } catch (e) {
+            console.error("Error Syncing Data:", e);
+
+            if (typeof Notification !== "undefined" && typeof Notification.error === 'function') {
                 Notification.error("Gagal memperbarui data");
             }
         }
 
-        setTimeout(function(){
+        // Hentikan animasi putar setelah 1 detik
+        setTimeout(function() {
             if (icon) icon.classList.remove("fa-spin");
         }, 1000);
     }
+
 
     // --- Helper Functions ---
     function getWeatherData() {
