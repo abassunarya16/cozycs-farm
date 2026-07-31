@@ -34,34 +34,73 @@ function finishLoading() {
     
     fetchWeatherAndLocation();
     
-    // Setup tombol-tombol
+    // Setup tombol-tombol (Waktu tunggu dikurangi agar langsung aktif)
     setTimeout(function() {
-        // Tombol Sync
+        // ==========================================
+        // TOMBOL SYNC / REFRESH 
+        // ==========================================
         var refreshBtn = document.getElementById('btnRefresh');
         if (refreshBtn) {
-            refreshBtn.addEventListener('click', function() {
+            // Kita pakai kloning untuk menghapus event lama agar tidak bentrok
+            var newRefreshBtn = refreshBtn.cloneNode(true);
+            refreshBtn.parentNode.replaceChild(newRefreshBtn, refreshBtn);
+            
+            newRefreshBtn.addEventListener('click', function(e) {
+                e.preventDefault();
                 var icon = this.querySelector('i');
-                if (icon) { icon.className = 'fas fa-spinner fa-spin'; }
                 
+                // 1. Nyalakan Animasi Muter (pada ikon aslinya)
+                if (icon) { 
+                    icon.classList.add('fa-spin'); 
+                    icon.style.color = '#C8E6C9'; // Sedikit berubah warna sebagai efek ditekan
+                }
+                
+                // 2. Fetch data GPS & Cuaca terbaru di background
                 fetchWeatherAndLocation();
                 
+                // 3. Jeda 0.8 detik supaya animasinya enak dilihat
                 setTimeout(function() {
-                    try { Notification.updateBadge(); } catch(e) {}
-                    try { Router.navigate(Router.getCurrentPage()); } catch(e) {}
-                    if (icon) { icon.className = 'fas fa-sync-alt'; }
-                    try { Notification.success('✅ Data diperbarui!'); } catch(e) {}
-                }, 1000);
+                    try { 
+                        // Update notifikasi
+                        if (typeof Notification !== 'undefined') Notification.updateBadge();
+                        
+                        // Render ulang halaman yang sedang aktif (Soft Refresh)
+                        if (typeof Router !== 'undefined') {
+                            var currentPage = Router.getCurrentPage();
+                            if (currentPage === 'dashboard' && typeof dashboard !== 'undefined') {
+                                document.getElementById('mainContent').innerHTML = dashboard.render();
+                            } else {
+                                Router.navigate(currentPage);
+                            }
+                        }
+                        
+                        // Matikan animasi dan kembalikan warna
+                        if (icon) { 
+                            icon.classList.remove('fa-spin'); 
+                            icon.style.color = ''; 
+                        }
+                        
+                        // Tampilkan pemberitahuan sukses
+                        if (typeof Notification !== 'undefined') Notification.success('✅ Data berhasil diperbarui!');
+                        
+                    } catch(err) {
+                        // Kalau Soft Refresh error, kita paksa Hard Refresh (Reload webnya)
+                        window.location.reload(true);
+                    }
+                }, 800);
             });
         }
         
-        // Tombol Notifikasi
+        // ==========================================
+        // TOMBOL NOTIFIKASI
+        // ==========================================
         var notifBtn = document.getElementById('btnNotification');
         if (notifBtn) {
             notifBtn.addEventListener('click', function() {
                 try { Notification.showNotificationPanel(); } catch(e) {}
             });
         }
-    }, 2000);
+    }, 500); // Waktu diubah dari 2000ms menjadi 500ms biar ga lemot saat diklik pertama kali
     
     // Hide splash
     setTimeout(function() {
@@ -75,6 +114,9 @@ function finishLoading() {
     }, 400);
 }
 
+// ==========================================
+// FETCH LOKASI & CUACA (Dengan penanganan error)
+// ==========================================
 function fetchWeatherAndLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -90,11 +132,11 @@ function fetchWeatherAndLocation() {
                         localStorage.setItem('cozycs_location', JSON.stringify({ city: city, lat: lat, lon: lon }));
                         var locEl = document.getElementById('locText');
                         if (locEl) locEl.textContent = city;
-                    });
+                    }).catch(function(e){ console.log("Info: API Lokasi lambat/gagal"); });
                 
                 fetchCuaca(lat, lon);
             },
-            function() {},
+            function(err) { console.log("GPS Ditolak/Gagal membaca lokasi"); },
             { enableHighAccuracy: true, timeout: 8000 }
         );
     }
@@ -126,9 +168,10 @@ function fetchCuaca(lat, lon) {
                 if (tempEl) tempEl.textContent = temp + '°C';
                 if (humidEl) humidEl.textContent = humid + '%';
             }
-        });
+        }).catch(function(e){ console.log("Info: Gagal mengambil cuaca"); });
 }
 
+// Auto refresh setiap 15 menit
 setInterval(function() { fetchWeatherAndLocation(); }, 900000);
 
 if (document.readyState === 'loading') {
