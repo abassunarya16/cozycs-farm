@@ -38,7 +38,7 @@ var hama = (function() {
                 
                 html += '<div style="display:flex; justify-content:flex-end; gap:6px;">';
                 html += '<button onclick="hama.editForm(\'' + h.id + '\')" style="padding:6px 12px; background:#E3F2FD; color:#1976D2; border:none; border-radius:6px; font-size:11px; cursor:pointer;"><i class="fas fa-edit"></i> Edit</button>';
-                html += '<button onclick="hama.deleteData(\'' + h.id + '\')" style="padding:6px 12px; background:#FFEBEE; color:#D32F2F; border:none; border-radius:6px; font-size:11px; cursor:pointer;"><i class="fas fa-trash-alt"></i> Hapus</button>';
+                html += '<button onclick="hama.deleteItem(\'' + h.id + '\')" style="padding:6px 12px; background:#FFEBEE; color:#D32F2F; border:none; border-radius:6px; font-size:11px; cursor:pointer;"><i class="fas fa-trash-alt"></i> Hapus</button>';
                 html += '</div>';
                 
                 html += '</div>';
@@ -63,12 +63,12 @@ var hama = (function() {
         content += '<div style="padding:20px;"><form onsubmit="hama.save(event,\'' + (id||'') + '\')">';
         content += '<div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:4px;">Tanaman ID</label><input name="tanaman_id" value="' + (data.tanaman_id||'') + '" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;" placeholder="GH01-T01-L01"></div>';
         content += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">';
-        content += '<div><label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:4px;">Tanggal *</label><input type="date" name="tanggal" value="' + (data.tanggal||getToday()) + '" required style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;"></div>';
-        content += '<div><label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:4px;">Jenis *</label><input name="jenis" value="' + (data.jenis||'') + '" required style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;" placeholder="Kutu Daun, Layu, dll"></div></div>';
+        content += '<div><label>Tanggal *</label><input type="date" name="tanggal" value="' + (data.tanggal||getToday()) + '" required style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;"></div>';
+        content += '<div><label>Jenis *</label><input name="jenis" value="' + (data.jenis||'') + '" required style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;" placeholder="Kutu Daun"></div></div>';
         content += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">';
-        content += '<div><label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:4px;">Tingkat *</label><select name="tingkat" required style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;background:#fff;"><option value="Ringan"' + (data.tingkat==='Ringan'?' selected':'') + '>🟢 Ringan</option><option value="Sedang"' + (data.tingkat==='Sedang'?' selected':'') + '>🟡 Sedang</option><option value="Berat"' + (data.tingkat==='Berat'?' selected':'') + '>🔴 Berat</option></select></div>';
-        content += '<div><label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:4px;">Penanganan</label><input name="penanganan" value="' + (data.penanganan||'') + '" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;" placeholder="Semprot insektisida"></div></div>';
-        content += '<div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:4px;">Catatan</label><textarea name="catatan" rows="2" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;" placeholder="Opsional...">' + (data.catatan||'') + '</textarea></div>';
+        content += '<div><label>Tingkat *</label><select name="tingkat" required style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;background:#fff;"><option value="Ringan">🟢 Ringan</option><option value="Sedang">🟡 Sedang</option><option value="Berat">🔴 Berat</option></select></div>';
+        content += '<div><label>Penanganan</label><input name="penanganan" value="' + (data.penanganan||'') + '" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;" placeholder="Semprot insektisida"></div></div>';
+        content += '<div style="margin-bottom:14px;"><label>Catatan</label><textarea name="catatan" rows="2" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;">' + (data.catatan||'') + '</textarea></div>';
         content += '<div style="display:flex;gap:10px;justify-content:flex-end;padding-top:16px;border-top:1px solid #eee;">';
         content += '<button type="button" onclick="hama.closeModal()" style="padding:12px 20px;background:#eee;border:none;border-radius:10px;font-size:14px;cursor:pointer;">Batal</button>';
         content += '<button type="submit" style="padding:12px 24px;background:#2E7D32;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">💾 Simpan</button>';
@@ -80,7 +80,7 @@ var hama = (function() {
 
     function editForm(id) { showForm(id); }
 
-    function deleteData(id) {
+    function deleteItem(id) {
         if (confirm('Hapus data hama ini?')) {
             Storage.remove(Storage.KEYS.HAMA, id);
             Router.navigate('hama');
@@ -92,37 +92,16 @@ var hama = (function() {
         event.preventDefault();
         var f = event.target;
         var d = { tanaman_id: f.tanaman_id.value, tanggal: f.tanggal.value, jenis: f.jenis.value, tingkat: f.tingkat.value, penanganan: f.penanganan.value, catatan: f.catatan.value };
-        if (id) {
-            Storage.update(Storage.KEYS.HAMA, id, d);
-        } else {
-            Storage.create(Storage.KEYS.HAMA, d);
-        }
+        if (id) Storage.update(Storage.KEYS.HAMA, id, d);
+        else Storage.create(Storage.KEYS.HAMA, d);
         closeModal();
         Router.navigate('hama');
         Notification.success('Data hama disimpan!');
     }
 
-    function closeModal() { 
-        document.getElementById('modalContainer').style.display = 'none'; 
-    }
-    
-    function formatDate(d) { 
-        if(!d) return '-'; 
-        var dt = new Date(d); 
-        return ('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2)+'/'+dt.getFullYear(); 
-    }
-    
-    function getToday() { 
-        return new Date().toISOString().split('T')[0]; 
-    }
+    function closeModal() { document.getElementById('modalContainer').style.display = 'none'; }
+    function formatDate(d) { if(!d)return'-'; var dt=new Date(d); return ('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2)+'/'+dt.getFullYear(); }
+    function getToday() { return new Date().toISOString().split('T')[0]; }
 
-    return { 
-        render: render, 
-        init: init, 
-        showForm: showForm, 
-        editForm: editForm, 
-        deleteData: deleteData, 
-        save: save, 
-        closeModal: closeModal 
-    };
+    return { render: render, init: init, showForm: showForm, editForm: editForm, deleteItem: deleteItem, save: save, closeModal: closeModal };
 })();
