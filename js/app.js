@@ -1,7 +1,5 @@
 var App = {
     init: function() {
-        console.log('App starting...');
-        
         var loadBar = document.getElementById('splashLoaderBar');
         var loadText = document.getElementById('splashLoadingText');
         var percent = 0;
@@ -36,21 +34,23 @@ function finishLoading() {
     
     fetchWeatherAndLocation();
     
-    // Tombol Refresh (Sync)
+    // Setup tombol-tombol
     setTimeout(function() {
+        // Tombol Sync
         var refreshBtn = document.getElementById('btnRefresh');
         if (refreshBtn) {
             refreshBtn.addEventListener('click', function() {
-                var icon = refreshBtn.querySelector('i');
+                var icon = this.querySelector('i');
                 if (icon) { icon.className = 'fas fa-spinner fa-spin'; }
                 
+                fetchWeatherAndLocation();
+                
                 setTimeout(function() {
-                    fetchWeatherAndLocation();
                     try { Notification.updateBadge(); } catch(e) {}
                     try { Router.navigate(Router.getCurrentPage()); } catch(e) {}
                     if (icon) { icon.className = 'fas fa-sync-alt'; }
-                    try { Notification.success('✅ Data tersinkronisasi!'); } catch(e) {}
-                }, 1500);
+                    try { Notification.success('✅ Data diperbarui!'); } catch(e) {}
+                }, 1000);
             });
         }
         
@@ -90,8 +90,7 @@ function fetchWeatherAndLocation() {
                         localStorage.setItem('cozycs_location', JSON.stringify({ city: city, lat: lat, lon: lon }));
                         var locEl = document.getElementById('locText');
                         if (locEl) locEl.textContent = city;
-                    })
-                    .catch(function() {});
+                    });
                 
                 fetchCuaca(lat, lon);
             },
@@ -127,8 +126,7 @@ function fetchCuaca(lat, lon) {
                 if (tempEl) tempEl.textContent = temp + '°C';
                 if (humidEl) humidEl.textContent = humid + '%';
             }
-        })
-        .catch(function() {});
+        });
 }
 
 setInterval(function() { fetchWeatherAndLocation(); }, 900000);
