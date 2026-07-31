@@ -23,7 +23,7 @@ var polinasi = (function() {
                 
                 html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">';
                 html += '<div><strong style="font-size:14px; color:#1B5E20;">' + p.tanaman_id + '</strong><br><small style="color:#888;">' + (tanaman ? tanaman.varietas : '-') + '</small></div>';
-                html += '<span class="status-badge ' + (p.status==='berhasil'?'active':'danger') + '" style="font-size:11px;">' + p.status + '</span>';
+                html += '<span class="status-badge ' + (p.status==='berhasil'?'active':'danger') + '" style="font-size:11px;">' + (p.status==='berhasil'?'✅ Berhasil':'❌ Gagal') + '</span>';
                 html += '</div>';
                 
                 html += '<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; text-align:center; margin-bottom:10px;">';
@@ -36,6 +36,7 @@ var polinasi = (function() {
                 
                 html += '<div style="display:flex; justify-content:flex-end; gap:6px;">';
                 html += '<button onclick="polinasi.editForm(\'' + p.id + '\')" style="padding:6px 12px; background:#E3F2FD; color:#1976D2; border:none; border-radius:6px; font-size:11px; cursor:pointer;"><i class="fas fa-edit"></i> Edit</button>';
+                html += '<button onclick="polinasi.deleteData(\'' + p.id + '\')" style="padding:6px 12px; background:#FFEBEE; color:#D32F2F; border:none; border-radius:6px; font-size:11px; cursor:pointer;"><i class="fas fa-trash-alt"></i> Hapus</button>';
                 html += '</div>';
                 
                 html += '</div>';
@@ -80,6 +81,18 @@ var polinasi = (function() {
 
     function editForm(id) { showForm(id); }
 
+    function deleteData(id) {
+        if (confirm('Hapus data polinasi ini?')) {
+            var data = Storage.getById(Storage.KEYS.POLINASI, id);
+            Storage.remove(Storage.KEYS.POLINASI, id);
+            if (data && data.tanaman_id) {
+                Storage.update(Storage.KEYS.TANAMAN, data.tanaman_id, { status_polinasi: 'belum polinasi' });
+            }
+            Router.navigate('polinasi');
+            Notification.success('Polinasi dihapus!');
+        }
+    }
+
     function save(event, id) {
         event.preventDefault();
         var f = event.target;
@@ -96,5 +109,5 @@ var polinasi = (function() {
     function formatDate(d) { if(!d)return'-'; var dt=new Date(d); return ('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2)+'/'+dt.getFullYear(); }
     function getToday() { return new Date().toISOString().split('T')[0]; }
 
-    return { render, init, showForm, editForm, save, closeModal };
+    return { render, init, showForm, editForm, deleteData, save, closeModal };
 })();
