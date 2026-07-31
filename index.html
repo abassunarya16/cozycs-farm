@@ -285,7 +285,122 @@
 
     <!-- App Container -->
     <div id="appContainer" class="app-container">
-        <!-- Header -->
+        
+        <!-- Header (YANG SEBELUMNYA TERPOTONG) -->
+        <header class="app-header">
+            <button id="menuToggle" class="btn-icon">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 id="headerTitle" class="header-title">
+                <img src="img/logo-clear.png" alt="Logo Cozycs Farm" class="logo-loading">
+                <span>Cozycs Farm</span>
+            </h1>
+            <div class="header-actions">
+                <button id="btnRefresh" class="btn-icon" title="Refresh Data">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button id="btnNotification" class="btn-icon">
+                    <i class="fas fa-bell"></i>
+                    <span id="notificationBadge" class="notification-badge" style="display:none;">0</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo"><img src="img/logo-clear.png" alt="Logo" onerror="this.style.display='none'"><span>Cozycs Farm 1.0</span></div>
+                <button id="sidebarClose" class="btn-icon"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="sidebar-menu" id="sidebarMenu"></div>
+            <div class="sidebar-footer">
+                <div class="storage-info"><i class="fas fa-database"></i><span id="storageUsage">0 KB / 5 MB</span></div>
+                <button id="btnBackupRestore" class="btn-sidebar-action"><i class="fas fa-cloud-upload-alt"></i> Backup & Restore</button>
+                <button id="btnSettings" class="btn-sidebar-action"><i class="fas fa-cog"></i> Pengaturan</button>
+            </div>
+        </nav>
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+        <!-- Main Content & Bottom Nav -->
+        <main id="mainContent" class="main-content"></main>
+        <nav id="bottomNav" class="bottom-nav"></nav>
+    </div>
+
+    <!-- Modal & Toast -->
+    <div id="modalContainer" class="modal-container">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- SCRIPTS EXTERNAL -->
+    <script src="js/storage.js"></script>
+    <script src="js/helper.js"></script>
+    <script src="js/notification.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/greenhouse.js"></script>
+    <script src="js/tanaman.js"></script>
+    <script src="js/polinasi.js"></script>
+    <script src="js/buah.js"></script>
+    <script src="js/nutrisi.js"></script>
+    <script src="js/pruning.js"></script>
+    <script src="js/hama.js"></script>
+    <script src="js/spray.js"></script>
+    <script src="js/jadwal.js"></script>
+    <script src="js/panen.js"></script>
+    <script src="js/laporan.js"></script>
+    <script src="js/gudang.js"></script>
+    <script src="js/keuangan.js"></script>
+    <script src="js/setting.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- SCRIPT SERVICE WORKER (Supaya bisa di-install) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((reg) => console.log('Service Worker berhasil didaftarkan.', reg))
+                    .catch((err) => console.log('Pendaftaran Service Worker gagal:', err));
+            });
+        }
+    </script>
+
+    <!-- SCRIPT LOADING SCREEN (Supaya tidak macet di 0%) -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let progress = 0;
+            const bar = document.getElementById('splashLoaderBar');
+            const text = document.getElementById('splashLoadingText');
+            const splash = document.getElementById('splashScreen');
+            const appContainer = document.getElementById('appContainer');
+
+            // Jalankan loading otomatis
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 20) + 10;
+                if (progress >= 100) progress = 100;
+                
+                if (bar) bar.style.width = progress + '%';
+                if (text) text.innerText = 'MEMUAT ' + progress + '%';
+
+                // Jika sudah 100%, hilangkan layar loading hijau
+                if (progress === 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        if (splash) splash.classList.add('hide');
+                        if (appContainer) appContainer.style.display = 'block';
+                        
+                        setTimeout(() => {
+                            if (splash) splash.style.display = 'none';
+                        }, 600);
+                    }, 500);
+                }
+            }, 150);
+        });
+    </script>
+</body>
+</html>
         <header class="app-header">
             <button id="menuToggle" class="btn-icon">
                 <i class="fas fa-bars"></i>
