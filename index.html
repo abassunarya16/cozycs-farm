@@ -281,19 +281,18 @@
             <h1 id="headerTitle" class="header-title">
                 <img src="img/logo.png" alt="Logo" onerror="this.style.display='none'"> Cozycs Farm 1.0
             </h1>
-                                                            <div class="header-actions">
-                <!-- Tombol Refresh Anti-Cache -->
-                <button id="btnRefresh" class="btn-icon" title="Refresh Data" onclick="this.querySelector('i').classList.add('fa-spin'); setTimeout(() => { window.location.href = window.location.pathname + '?v=' + new Date().getTime(); }, 500);">
+                                                                        <div class="header-actions">
+                <!-- Tombol Sync Langsung Memanggil dashboard.syncData() -->
+                <button id="syncBtn" class="btn-icon" title="Refresh Data" onclick="if(window.dashboard && typeof dashboard.syncData === 'function') { dashboard.syncData(); }">
                     <i class="fas fa-sync-alt"></i>
                 </button>
-                
+
                 <!-- Tombol Notifikasi -->
                 <button id="btnNotification" class="btn-icon">
                     <i class="fas fa-bell"></i>
                     <span id="notificationBadge" class="notification-badge" style="display:none;">0</span>
                 </button>
             </div>
-
 
         </header>
 
