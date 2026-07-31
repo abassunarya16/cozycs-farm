@@ -152,4 +152,4 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() { App.init(); });
 } else {
     App.init();
-            }
+}
