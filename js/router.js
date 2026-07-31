@@ -156,7 +156,7 @@ var Router = (function() {
         }
     }
 
-    function buildBottomNav() {
+        function buildBottomNav() {
         var nav = document.getElementById('bottomNav');
         if (!nav) return;
         
@@ -170,19 +170,25 @@ var Router = (function() {
         
         var html = '';
         bottomPages.forEach(function(p) {
-            html += '<button class="bottom-nav-item" data-page="' + p.key + '">';
+            // PERBAIKAN: Menambahkan onclick langsung supaya anti-gagal saat disentuh
+            html += '<button class="bottom-nav-item" data-page="' + p.key + '" onclick="Router.navigate(\'' + p.key + '\')">';
             html += '<i class="fas ' + p.icon + '"></i>';
             html += '<span>' + p.title + '</span>';
             html += '</button>';
         });
         
         nav.innerHTML = html;
+        
+        // Memastikan event listener tetap terpasang dengan aman
         nav.querySelectorAll('.bottom-nav-item').forEach(function(item) {
-            item.addEventListener('click', function() {
-                navigate(this.getAttribute('data-page'));
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                var targetPage = this.getAttribute('data-page');
+                navigate(targetPage);
             });
         });
     }
+
 
     function toggleSidebar() {
         var sidebar = document.getElementById('sidebar');
