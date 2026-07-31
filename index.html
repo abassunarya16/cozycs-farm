@@ -1425,6 +1425,11 @@
     <script src="js/keuangan.js"></script>
     <script src="js/setting.js"></script>
     <script src="js/app.js"></script>
+    <script>
+    window.onerror = function(msg, url, line) {
+        alert('ERROR: ' + msg + '\nFile: ' + url + '\nLine: ' + line);
+    };
+    </script>
 
 </body>
 </html>
