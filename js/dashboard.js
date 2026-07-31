@@ -79,51 +79,6 @@ var dashboard = (function() {
         setInterval(updateDateTime, 30000);
     }
 
-    // ==========================================
-    // FUNGSI SYNC DATA DARI AYY
-    // ==========================================
-    function syncData() {
-        var btn = document.getElementById("syncBtn");
-        if (!btn) btn = document.getElementById("btnRefresh");
-        
-        var icon = btn ? btn.querySelector("i") : null;
-        if (icon) icon.classList.add("fa-spin");
-
-        try {
-            // Update HST otomatis
-            if (window.Storage && typeof Storage.updateAllHST === 'function') {
-                Storage.updateAllHST();
-            }
-
-            // Update Weather
-            if (typeof fetchWeatherAndLocation === 'function') {
-                fetchWeatherAndLocation();
-            } else if (window.weather && typeof weather.updateWeather === 'function') {
-                weather.updateWeather();
-            }
-
-            // Reload semua halaman via router
-            if (window.Router && typeof Router.navigate === 'function') {
-                Router.navigate("dashboard");
-            }
-
-            if (typeof Notification !== "undefined" && typeof Notification.success === 'function') {
-                Notification.success("Data berhasil diperbarui");
-            }
-
-        } catch(e) {
-            console.error(e);
-            if (typeof Notification !== "undefined" && typeof Notification.error === 'function') {
-                Notification.error("Gagal memperbarui data");
-            }
-        }
-
-        setTimeout(function() {
-            if (icon) icon.classList.remove("fa-spin");
-        }, 1000);
-    }
-
-    // --- Helper Functions ---
     function getWeatherData() {
         try {
             var saved = localStorage.getItem('cozycs_weather');
@@ -209,13 +164,46 @@ var dashboard = (function() {
         return 'Selamat Malam';
     }
 
-    // ==========================================
-    // EKSPOR FUNGSI KE LUAR (RETURN)
-    // ==========================================
-    return { 
-        render: render, 
-        init: init,
-        syncData: syncData
-    };
+    return { render: render, init: init };
 
 })();
+
+// ==========================================
+// FUNGSI GLOBAL SYNC (GAMPANG DIPANGGIL DIPISAH)
+// ==========================================
+function syncData() {
+    var btn = document.getElementById("syncBtn");
+    var icon = btn ? btn.querySelector("i") : null;
+
+    if (icon) icon.classList.add("fa-spin");
+
+    try {
+        // 1. Update HST otomatis
+        if (window.Storage && typeof Storage.updateAllHST === 'function') {
+            Storage.updateAllHST();
+        }
+
+        // 2. Fetch Cuaca & Lokasi
+        if (typeof fetchWeatherAndLocation === 'function') {
+            fetchWeatherAndLocation();
+        }
+
+        // 3. Render ulang tampilan
+        if (window.Router && typeof Router.navigate === 'function') {
+            Router.navigate("dashboard");
+        }
+
+        if (typeof Notification !== "undefined" && typeof Notification.success === 'function') {
+            Notification.success("Data berhasil diperbarui");
+        }
+    } catch(e) {
+        console.error(e);
+        if (typeof Notification !== "undefined" && typeof Notification.error === 'function') {
+            Notification.error("Gagal memperbarui data");
+        }
+    }
+
+    setTimeout(function() {
+        if (icon) icon.classList.remove("fa-spin");
+    }, 1000);
+}
