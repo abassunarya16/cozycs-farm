@@ -2,6 +2,27 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <!-- SKRIP DARURAT: PEMBERSIH CACHE NYANGKUT (DATA AMAN) -->
+    <script>
+        // Hapus Service Worker yang bermasalah
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
+        // Hapus Cache memori lama
+        if ('caches' in window) {
+            caches.keys().then(function(names) {
+                for (let name of names) {
+                    caches.delete(name);
+                }
+            });
+        }
+    </script>
+    <!-- BATAS SKRIP DARURAT -->
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#1B5E20">
