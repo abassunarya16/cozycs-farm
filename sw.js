@@ -75,39 +75,33 @@ self.addEventListener('activate', event => {
     );
 });
 
-// Fetch Event - Cache First Strategy
+// Fetch Event - NETWORK FIRST STRATEGY (Anti Nyangkut)
 self.addEventListener('fetch', event => {
-    // Skip non-GET requests
+    // Abaikan selain GET request
     if (event.request.method !== 'GET') return;
-    
-    // Skip chrome-extension requests
     if (!event.request.url.startsWith('http')) return;
     
     event.respondWith(
-        caches.match(event.request)
-            .then(cachedResponse => {
-                if (cachedResponse) {
-                    return cachedResponse;
-                }
-                
-                return fetch(event.request)
-                    .then(response => {
-                        // Cache dynamic content
-                        return caches.open(DYNAMIC_CACHE)
-                            .then(cache => {
-                                cache.put(event.request.url, response.clone());
-                                return response;
-                            });
-                    })
-                    .catch(() => {
-                        // Offline fallback
+        // 1. COBA AMBIL DARI INTERNET DULU (Biar selalu update)
+        fetch(event.request)
+            .then(response => {
+                // Simpan versi terbarunya ke cache diam-diam
+                return caches.open(DYNAMIC_CACHE).then(cache => {
+                    cache.put(event.request.url, response.clone());
+                    return response;
+                });
+            })
+            .catch(() => {
+                // 2. KALAU OFFLINE/TIDAK ADA SINYAL, BARU PAKAI CACHE LAMA
+                return caches.match(event.request)
+                    .then(cachedResponse => {
+                        if (cachedResponse) {
+                            return cachedResponse;
+                        }
+                        // Fallback offline
                         if (event.request.headers.get('accept').includes('text/html')) {
                             return caches.match('/index.html');
                         }
-                        return new Response('Offline - Data tidak tersedia', {
-                            status: 503,
-                            statusText: 'Service Unavailable'
-                        });
                     });
             })
     );
