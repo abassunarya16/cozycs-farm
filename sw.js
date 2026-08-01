@@ -1,6 +1,6 @@
-// Cozycs Farm V2 - Service Worker
-const CACHE_NAME = 'cozycs-farm-v2-cache';
-const DYNAMIC_CACHE = 'cozycs-farm-v2-dynamic';
+// Cozycs Farm V1.0 - Service Worker
+const CACHE_NAME = 'cozycs-farm-v1.0-cache';
+const DYNAMIC_CACHE = 'cozycs-farm-v1.0-dynamic';
 
 // Resources to cache on install
 const STATIC_ASSETS = [
@@ -39,7 +39,7 @@ const STATIC_ASSETS = [
 
 // Install Event
 self.addEventListener('install', event => {
-    console.log('[SW] Installing Service Worker...');
+    console.log('[SW] Installing Service Worker v1.0...');
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
@@ -55,7 +55,7 @@ self.addEventListener('install', event => {
 
 // Activate Event
 self.addEventListener('activate', event => {
-    console.log('[SW] Activating Service Worker...');
+    console.log('[SW] Activating Service Worker v1.0...');
     event.waitUntil(
         caches.keys()
             .then(cacheNames => {
